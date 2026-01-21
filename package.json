@@ -7,17 +7,24 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "postinstall": "prisma generate --schema=./server/prisma/schema.prisma"
   },
   "dependencies": {
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router-dom": "^7.12.0"
+    "react-router-dom": "^7.12.0",
+    "@prisma/client": "^5.13.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "prisma": "^5.13.0"
   }
 }
