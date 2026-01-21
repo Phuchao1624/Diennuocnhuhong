@@ -20,7 +20,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="flex flex-col bg-white dark:bg-[#1a2632] shadow-sm sticky top-0 z-50 transition-colors">
-      <div className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f5] dark:border-b-gray-700 px-4 lg:px-10 py-4">
+      <div className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f5] dark:border-b-gray-700 px-3 md:px-10 py-3 md:py-4">
         <div className="flex items-center gap-4 lg:gap-12 w-full max-w-[1200px] mx-auto">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 lg:gap-3 text-[#111418] dark:text-white shrink-0 cursor-pointer">

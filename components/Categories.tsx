@@ -22,14 +22,14 @@ const Categories: React.FC = () => {
           Xem tất cả <span className="material-symbols-outlined text-sm">arrow_forward</span>
         </a>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-6">
         {categories.map((category) => (
           <Link
             to={`/?categoryId=${category.id}`}
             key={category.id}
-            className="group flex flex-col gap-4 rounded-xl border border-[#dbe0e6] dark:border-gray-700 bg-white dark:bg-[#1a2632] p-6 items-center hover:shadow-xl hover:border-primary transition-all duration-300"
+            className="group flex flex-col gap-3 rounded-xl border border-[#dbe0e6] dark:border-gray-700 bg-white dark:bg-[#1a2632] p-4 items-center hover:shadow-xl hover:border-primary transition-all duration-300"
           >
-            <div className="text-primary p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl group-hover:scale-110 transition-transform">
+            <div className="text-primary p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl group-hover:scale-110 transition-transform">
               <span className="material-symbols-outlined text-[40px]">{category.icon}</span>
             </div>
             <h2 className="text-[#111418] dark:text-white text-base font-bold leading-tight text-center">

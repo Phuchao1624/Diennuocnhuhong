@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const { login } = useAuth();
+    const { showToast } = useToast();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -21,6 +20,7 @@ const Login: React.FC = () => {
             const data = await res.json();
             if (res.ok) {
                 login(data.token, data.user);
+                showToast('Đăng nhập thành công!', 'success');
                 navigate('/');
             } else {
                 setError(data.error);

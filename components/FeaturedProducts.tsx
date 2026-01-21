@@ -38,7 +38,7 @@ const FeaturedProducts: React.FC = () => {
         {q ? `Kết quả tìm kiếm cho "${q}"` : 'Sản phẩm nổi bật'}
       </h2>
       {!products.length && <p className="text-center text-gray-500">Không tìm thấy sản phẩm nào.</p>}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         {products.map((product) => (
           <Link
             to={`/product/${product.id}`}
@@ -57,7 +57,7 @@ const FeaturedProducts: React.FC = () => {
                 </div>
               )}
             </div>
-            <div className="flex flex-col p-5 gap-3 flex-1">
+            <div className="flex flex-col p-3 md:p-5 gap-2 md:gap-3 flex-1">
               {/* Rating */}
               <div className="flex items-center gap-1 text-yellow-400 text-[10px]">
                 {[...Array(5)].map((_, i) => (

@@ -3,7 +3,7 @@ import React from 'react';
 const Hero: React.FC = () => {
   return (
     <div className="@container">
-      <div className="flex flex-col gap-6 rounded-2xl overflow-hidden bg-white dark:bg-[#1a2632] shadow-sm ring-1 ring-gray-100 dark:ring-gray-700 p-6 md:p-12 @[864px]:flex-row items-center transition-colors">
+      <div className="flex flex-col gap-4 md:gap-6 rounded-2xl overflow-hidden bg-white dark:bg-[#1a2632] shadow-sm ring-1 ring-gray-100 dark:ring-gray-700 p-4 md:p-12 @[864px]:flex-row items-center transition-colors">
         <div
           className="w-full aspect-video rounded-xl @[864px]:w-1/2 bg-cover bg-center"
           style={{
