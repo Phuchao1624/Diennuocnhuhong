@@ -1,6 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
+const ACTUAL_HERO_IMAGES = [
+  "https://lh3.googleusercontent.com/gps-cs-s/AG0ilSwx2APMlApMvcHiheowvQdOVACOQRsF-y4fT39_OrvjEFzgNcsqUx1IE_SYfc68inw7jQkUmmhBwToVI1gRiOed0aaL6q7WW0JFMRboYBEg2FjGMmamtc04QpxLE5DiHRGtVrPxDdzz3t71=w397-h298-k-no",
+  "https://streetviewpixels-pa.googleapis.com/v1/thumbnail?cb_client=maps_sv.tactile&w=900&h=600&pitch=0&panoid=uQ4Yvf4Nt0kh28tapOOfXA&yaw=88.416824"
+];
 
 const Hero: React.FC = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % ACTUAL_HERO_IMAGES.length);
+    }, 5000); // Change image every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % ACTUAL_HERO_IMAGES.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev === 0 ? ACTUAL_HERO_IMAGES.length - 1 : prev - 1));
+  };
+
   return (
     <div className="@container">
       <div className="flex flex-col gap-6 px-4 md:px-0 py-4 md:py-8 lg:gap-12 lg:px-20 lg:py-12 bg-white dark:bg-[#1a2632] rounded-xl shadow-sm border border-[#dbe0e6] dark:border-gray-700 overflow-hidden relative">
