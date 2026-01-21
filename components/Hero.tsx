@@ -3,30 +3,64 @@ import React from 'react';
 const Hero: React.FC = () => {
   return (
     <div className="@container">
-      <div className="flex flex-col gap-4 md:gap-6 rounded-2xl overflow-hidden bg-white dark:bg-[#1a2632] shadow-sm ring-1 ring-gray-100 dark:ring-gray-700 p-4 md:p-12 @[864px]:flex-row items-center transition-colors">
-        <div
-          className="w-full aspect-video rounded-xl @[864px]:w-1/2 bg-cover bg-center"
-          style={{
-            backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDPm7MZuOdqFPffLkkI-E1y5zG3Miv0ar3iV_xfTccvmvhU7yTVJAZ8cJoGXfU7RbKGcwQbu17GtY87VVoJgX8u23amjUx1J-E02a2mqbAqgqyorK1FIs0H8WXNWl3IanBgHK50lLxF3vTlZtyzs5i8FFULzWY-2w2Ca3zRSM0B1VAUrgFE4klKxyXnK3PW7K9HRBuFZh2WmwH5T3WT3Apmsl9aIZG6_q9K9Jf6X6AmDMbyJJfoYtNiRi1RoGwnCPtJJT7cHkaN5Us")',
-          }}
-          aria-label="Modern electrical tools and blueprints on a table"
-        />
-        <div className="flex flex-col gap-6 @[864px]:w-1/2 @[864px]:pl-10 justify-center">
-          <div className="flex flex-col gap-3 text-left">
-            <span className="text-accent font-bold tracking-widest text-xs uppercase bg-orange-50 dark:bg-orange-900/20 px-3 py-1 rounded-full w-fit">
-              Ưu đãi mùa sửa sang
-            </span>
-            <h1 className="text-[#111418] dark:text-white text-3xl md:text-4xl lg:text-6xl font-black leading-[1.1] tracking-[-0.03em]">
-              Điện Nước Như Hồng <br />
-              <span className="text-primary">Chuyên Nghiệp</span>
-            </h1>
-            <p className="text-[#60758a] dark:text-gray-300 text-base md:text-lg font-normal leading-relaxed">
-              Giảm giá lên đến <span className="text-accent font-bold text-xl">40%</span> cho các dòng ống nhựa PVC & Thiết bị điện dân dụng. Chất lượng hàng đầu cho ngôi nhà của bạn.
+      <div className="flex flex-col gap-6 px-4 md:px-0 py-4 md:py-8 lg:gap-12 lg:px-20 lg:py-12 bg-white dark:bg-[#1a2632] rounded-xl shadow-sm border border-[#dbe0e6] dark:border-gray-700 overflow-hidden relative">
+        <div className="flex flex-col md:flex-row gap-8 items-center">
+          <div className="flex flex-col gap-4 md:gap-8 flex-1">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-[#111418] dark:text-white text-3xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
+                Điện Nước <span className="text-primary">Như Hồng</span>
+              </h1>
+              <h2 className="text-[#111418] dark:text-white text-lg md:text-xl font-bold leading-tight tracking-[-0.015em]">
+                Chuyên cung cấp thiết bị điện nước chính hãng, uy tín tại Quảng Nam
+              </h2>
+            </div>
+            <p className="text-[#60758a] dark:text-gray-300 text-sm md:text-base font-normal leading-normal">
+              Giảm giá đặc biệt cho các đơn hàng lớn. Miễn phí vận chuyển trong bán kính 10km. Bảo hành chính hãng 1 đổi 1.
             </p>
+            <div className="flex gap-3">
+              <Link to="/?q=" className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-600 transition-colors">
+                <span className="truncate">Mua ngay</span>
+              </Link>
+              <Link to="/contact" className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f0f2f5] dark:bg-gray-700 text-[#111418] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                <span className="truncate">Liên hệ</span>
+              </Link>
+            </div>
           </div>
-          <button className="flex w-fit cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-10 bg-accent hover:bg-orange-600 transition-all transform hover:scale-105 text-white text-lg font-bold leading-normal tracking-[0.015em] shadow-lg shadow-orange-500/30">
-            <span className="truncate">Mua Sắm Ngay</span>
-          </button>
+
+          <div className="w-full md:w-1/2 aspect-video relative rounded-xl overflow-hidden group">
+            <div
+              className="w-full h-full bg-cover bg-center transition-all duration-700 ease-in-out transform hover:scale-105"
+              style={{ backgroundImage: `url(${ACTUAL_HERO_IMAGES[currentImageIndex]})` }}
+            ></div>
+
+            {/* Overlay Gradient for text readability if needed, though mostly for style here */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+
+            {/* Navigation Buttons */}
+            <button
+              onClick={(e) => { e.preventDefault(); prevImage(); }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <span className="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button
+              onClick={(e) => { e.preventDefault(); nextImage(); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <span className="material-symbols-outlined">chevron_right</span>
+            </button>
+
+            {/* Indicators */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
+              {ACTUAL_HERO_IMAGES.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImageIndex(idx)}
+                  className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/80'}`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
