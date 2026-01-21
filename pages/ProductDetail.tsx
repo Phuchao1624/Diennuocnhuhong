@@ -35,8 +35,8 @@ const ProductDetail: React.FC = () => {
     if (!product) return <div className="p-10 text-center">Sản phẩm không tồn tại</div>;
 
     return (
-        <div className="flex flex-1 justify-center py-8 px-4 lg:px-0">
-            <div className="flex flex-col max-w-[1600px] flex-1 w-full gap-12">
+        <div className="flex flex-1 justify-center py-8 px-4">
+            <div className="flex flex-col max-w-[1920px] flex-1 w-full gap-12">
 
                 {/* Top Section: Image & Basic Info */}
                 <div className="flex flex-col md:flex-row gap-10">

@@ -23,8 +23,8 @@ const Contact: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center py-8 px-4 lg:px-0 bg-slate-50 dark:bg-[#111418]">
-            <div className="flex flex-col max-w-[1600px] w-full gap-10">
+        <div className="flex flex-col items-center justify-center py-8 px-4 bg-slate-50 dark:bg-[#111418]">
+            <div className="flex flex-col max-w-[1920px] w-full gap-10">
 
                 {/* Header Section */}
                 <div className="flex flex-col gap-4 text-center">
