@@ -25,11 +25,14 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <div className="@container">
-      <div className="flex flex-col gap-6 px-4 md:px-0 py-4 md:py-8 lg:gap-12 lg:px-20 lg:py-12 bg-white dark:bg-[#1a2632] rounded-xl shadow-sm border border-[#dbe0e6] dark:border-gray-700 overflow-hidden relative">
-        <div className="flex flex-col md:flex-row gap-8 items-center">
-          <div className="flex flex-col gap-4 md:gap-8 flex-1">
-            <div className="flex flex-col gap-2">
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-12 px-4 py-6 md:px-10 md:py-10 bg-white dark:bg-[#1a2632] rounded-xl shadow-sm border border-[#dbe0e6] dark:border-gray-700 overflow-hidden relative">
+        <div className="flex flex-col lg:flex-row gap-8 items-center w-full">
+          <div className="flex flex-col gap-4 md:gap-8 flex-1 w-full lg:w-1/2">
+            <div className="flex flex-col gap-2 text-center lg:text-left">
+              <span className="text-accent font-bold tracking-widest text-xs uppercase bg-orange-50 dark:bg-orange-900/20 px-3 py-1 rounded-full w-fit mx-auto lg:mx-0">
+                Ưu đãi mùa sửa sang
+              </span>
               <h1 className="text-[#111418] dark:text-white text-3xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
                 Điện Nước <span className="text-primary">Như Hồng</span>
               </h1>
@@ -37,10 +40,10 @@ const Hero: React.FC = () => {
                 Chuyên cung cấp thiết bị điện nước chính hãng, uy tín tại Quảng Nam
               </h2>
             </div>
-            <p className="text-[#60758a] dark:text-gray-300 text-sm md:text-base font-normal leading-normal">
+            <p className="text-[#60758a] dark:text-gray-300 text-sm md:text-base font-normal leading-normal text-center lg:text-left">
               Giảm giá đặc biệt cho các đơn hàng lớn. Miễn phí vận chuyển trong bán kính 10km. Bảo hành chính hãng 1 đổi 1.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 justify-center lg:justify-start">
               <Link to="/?q=" className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-600 transition-colors">
                 <span className="truncate">Mua ngay</span>
               </Link>
@@ -50,16 +53,14 @@ const Hero: React.FC = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 aspect-video relative rounded-xl overflow-hidden group">
+          <div className="w-full lg:w-1/2 aspect-video relative rounded-xl overflow-hidden group shadow-lg">
             <div
               className="w-full h-full bg-cover bg-center transition-all duration-700 ease-in-out transform hover:scale-105"
               style={{ backgroundImage: `url(${ACTUAL_HERO_IMAGES[currentImageIndex]})` }}
             ></div>
 
-            {/* Overlay Gradient for text readability if needed, though mostly for style here */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
 
-            {/* Navigation Buttons */}
             <button
               onClick={(e) => { e.preventDefault(); prevImage(); }}
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
@@ -73,7 +74,6 @@ const Hero: React.FC = () => {
               <span className="material-symbols-outlined">chevron_right</span>
             </button>
 
-            {/* Indicators */}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
               {ACTUAL_HERO_IMAGES.map((_, idx) => (
                 <button

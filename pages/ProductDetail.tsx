@@ -41,7 +41,7 @@ const ProductDetail: React.FC = () => {
                 {/* Top Section: Image & Basic Info */}
                 <div className="flex flex-col md:flex-row gap-10">
                     <div className="w-full md:w-7/12 bg-white rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-8 flex items-center justify-center">
-                        <img src={product.image} alt={product.name} className="w-full max-h-[500px] object-contain" />
+                        <img src={product.image} alt={product.name} className="w-full max-h-[300px] md:max-h-[500px] object-contain" />
                     </div>
                     <div className="w-full md:w-5/12 flex flex-col gap-6">
                         <div className="flex flex-col gap-2">
