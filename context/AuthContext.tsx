@@ -25,22 +25,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    try {
-                        const res = await fetch('/api/auth/me', {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
-                        if (res.ok) {
-                            const data = await res.json();
-                            setUser(data);
-                        } else {
-                            localStorage.removeItem('token');
-                        }
-                    } catch (error) {
+                    const res = await fetch('/api/auth/me', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        setUser(data);
+                    } else {
                         localStorage.removeItem('token');
                     }
+                } catch (error) {
+                    localStorage.removeItem('token');
                 }
+            }
             setLoading(false);
-            };
             checkAuth();
         }, []);
 
