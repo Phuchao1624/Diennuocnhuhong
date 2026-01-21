@@ -387,10 +387,19 @@ app.get('/api/admin/analytics', async (req, res) => {
 });
 
 // Validate Coupon
-res.json(coupon);
+app.post('/api/coupons/validate', async (req, res) => {
+    try {
+        const { code } = req.body;
+        const coupon = await prisma.coupon.findUnique({ where: { code } });
+
+        if (!coupon) return res.status(404).json({ error: 'Mã giảm giá không tồn tại' });
+        if (!coupon.isActive) return res.status(400).json({ error: 'Mã giảm giá đã hết hạn' });
+        if (new Date() > new Date(coupon.expiry)) return res.status(400).json({ error: 'Mã giảm giá đã hết hạn' });
+
+        res.json(coupon);
     } catch (error) {
-    res.status(500).json({ error: 'Failed' });
-}
+        res.status(500).json({ error: 'Failed' });
+    }
 });
 
 if (process.env.NODE_ENV !== 'production' || process.env.VITE_CMD === 'true') {

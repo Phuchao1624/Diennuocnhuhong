@@ -2,8 +2,8 @@ import React from 'react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-white dark:bg-[#1a2632] border-t border-[#dbe0e6] dark:border-gray-700 py-16 px-4 mt-12 transition-colors">
-      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+    <footer className="bg-white dark:bg-[#1a2632] border-t border-[#dbe0e6] dark:border-gray-700 py-8 md:py-16 px-4 mt-6 md:mt-12 transition-colors">
+      <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
 
         {/* Brand Column */}
         <div className="flex flex-col gap-6">
@@ -65,7 +65,7 @@ const Footer: React.FC = () => {
       </div>
 
       {/* Footer Bottom */}
-      <div className="max-w-[1200px] mx-auto mt-16 border-t border-gray-100 dark:border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div className="max-w-[1200px] mx-auto mt-8 md:mt-16 border-t border-gray-100 dark:border-gray-700 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
         <p className="text-xs text-[#60758a] dark:text-gray-500">© 2024 Điện Nước Như Hồng. Bảo lưu mọi quyền.</p>
         <div className="flex gap-4">
           <div className="h-8 w-12 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center text-[10px] text-gray-400 font-bold">VISA</div>
