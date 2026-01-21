@@ -19,9 +19,9 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="flex flex-col bg-white dark:bg-[#1a2632] shadow-sm sticky top-0 z-50 transition-colors">
-      <div className="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f5] dark:border-b-gray-700 px-4 py-3 md:py-4">
-        <div className="flex items-center gap-4 lg:gap-12 w-full max-w-[1920px] mx-auto px-4">
+    <header className="flex flex-col bg-white dark:bg-[#1a2632] shadow-sm sticky top-0 z-50 transition-colors w-full">
+      <div className="w-full border-b border-solid border-b-[#f0f2f5] dark:border-b-gray-800 bg-white dark:bg-[#1a2632]">
+        <div className="w-full px-4 py-3 md:py-4 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 lg:gap-3 text-[#111418] dark:text-white shrink-0 cursor-pointer">
             <div className="size-10 text-primary flex items-center justify-center bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -133,10 +133,10 @@ const Header: React.FC = () => {
         </div>
       )}
 
-      {/* Navigation Tabs */}
-      <div className="hidden md:block border-b border-[#dbe0e6] dark:border-gray-700 bg-white dark:bg-[#1a2632]">
-        <div className="flex justify-center px-4">
-          <div className="flex overflow-x-auto no-scrollbar gap-8 max-w-[1200px] w-full">
+      {/* Navigation Tabs - Desktop */}
+      <div className="hidden md:block border-b border-[#f0f2f5] dark:border-gray-800 bg-white dark:bg-[#1a2632] w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center lg:justify-start gap-8 overflow-x-auto no-scrollbar py-1">
             {MENU_ITEMS.map((item, index) => {
               const catId = item === "Tất cả" ? 0 : index;
               return (
@@ -146,12 +146,13 @@ const Header: React.FC = () => {
                     setActiveTab(item);
                     navigate(catId === 0 ? '/' : `/?categoryId=${catId}`);
                   }}
-                  className={`flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 shrink-0 transition-colors ${activeTab === item
-                    ? 'border-b-primary text-primary'
-                    : 'border-b-transparent text-[#60758a] dark:text-gray-400 hover:text-primary'
+                  className={`relative py-4 text-sm font-bold uppercase tracking-wide transition-colors whitespace-nowrap
+                    ${activeTab === item
+                      ? 'text-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-primary'
                     }`}
                 >
-                  <p className="text-sm font-bold leading-normal tracking-wide uppercase">{item}</p>
+                  {item}
                 </button>
               );
             })}

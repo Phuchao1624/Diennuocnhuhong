@@ -7,13 +7,15 @@ import Newsletter from '../components/Newsletter';
 
 const Home: React.FC = () => {
     return (
-        <div className="flex flex-1 justify-center py-4 md:py-8 px-4">
-            <div className="layout-content-container flex flex-col max-w-[1920px] flex-1 w-full gap-5 md:gap-10">
+        <div className="flex flex-1 flex-col w-full">
+            <div className="flex flex-col w-full gap-8 md:gap-12 pb-12">
                 <Hero />
-                <Features />
-                <Categories />
-                <FeaturedProducts />
-                <Newsletter />
+                <div className="px-4 lg:px-8 flex flex-col gap-8 md:gap-16 max-w-[1920px] mx-auto w-full">
+                    <Features />
+                    <Categories />
+                    <FeaturedProducts />
+                    <Newsletter />
+                </div>
             </div>
         </div>
     );

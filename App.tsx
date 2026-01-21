@@ -27,8 +27,9 @@ const App: React.FC = () => {
       <ToastProvider>
         <CartProvider>
           <BrowserRouter>
-            <div className="flex flex-col min-h-screen font-sans bg-slate-50 dark:bg-[#111418]">
+            <div className="flex flex-col min-h-screen font-sans bg-white dark:bg-[#111418] text-[#111418] dark:text-white">
               <Header />
+              <div className="w-full h-[1px] bg-[#e5e7eb] dark:bg-gray-800"></div>
               <main className="flex-1 w-full">
                 <Routes>
                   <Route path="/" element={<Home />} />
