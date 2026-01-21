@@ -8,7 +8,14 @@ const Categories: React.FC = () => {
   useEffect(() => {
     fetch('/api/categories')
       .then(res => res.json())
-      .then(data => setCategories(data))
+      .then(data => {
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          console.error("API did not return an array:", data);
+          setCategories([]);
+        }
+      })
       .catch(err => console.error("Failed to fetch categories", err));
   }, []);
 

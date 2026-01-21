@@ -21,7 +21,12 @@ const FeaturedProducts: React.FC = () => {
     fetch(url)
       .then(res => res.json())
       .then(data => {
-        setProducts(data);
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error("API did not return an array:", data);
+          setProducts([]);
+        }
         setLoading(false);
       })
       .catch(err => {
