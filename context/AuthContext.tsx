@@ -39,8 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
             }
             setLoading(false);
-            checkAuth();
-        }, []);
+        };
+        checkAuth();
+    }, []);
 
     const login = (token: string, userData: User) => {
         localStorage.setItem('token', token);
