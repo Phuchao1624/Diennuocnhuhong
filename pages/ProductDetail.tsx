@@ -36,7 +36,7 @@ const ProductDetail: React.FC = () => {
 
     return (
         <div className="flex flex-1 justify-center py-8 px-4 lg:px-0">
-            <div className="flex flex-col max-w-[1200px] flex-1 w-full gap-12">
+            <div className="flex flex-col max-w-[1600px] flex-1 w-full gap-12">
 
                 {/* Top Section: Image & Basic Info */}
                 <div className="flex flex-col md:flex-row gap-10">
