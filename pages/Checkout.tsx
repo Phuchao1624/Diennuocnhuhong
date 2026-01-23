@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 import { useToast } from '../context/ToastContext';
+import { Address } from '../types';
 
 const Checkout: React.FC = () => {
     const { cart, total, finalTotal, coupon, clearCart } = useCart();
@@ -12,7 +13,7 @@ const Checkout: React.FC = () => {
     const navigate = useNavigate();
     const [address, setAddress] = useState('');
     const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
-    const [addresses, setAddresses] = useState<any[]>([]);
+    const [addresses, setAddresses] = useState<Address[]>([]);
     const [paymentMethod, setPaymentMethod] = useState('COD'); // COD, BANKING
     const [loading, setLoading] = useState(false);
 
@@ -22,9 +23,9 @@ const Checkout: React.FC = () => {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             })
                 .then(res => res.json())
-                .then(data => {
+                .then((data: Address[]) => {
                     setAddresses(data);
-                    const defaultAddr = data.find((a: any) => a.isDefault);
+                    const defaultAddr = data.find((a) => a.isDefault);
                     if (defaultAddr) {
                         setSelectedAddressId(defaultAddr.id);
                         setAddress(`${defaultAddr.name} - ${defaultAddr.phone} - ${defaultAddr.detail}`);
@@ -34,7 +35,7 @@ const Checkout: React.FC = () => {
         }
     }, [user]);
 
-    const handleSelectAddress = (addr: any) => {
+    const handleSelectAddress = (addr: Address) => {
         setSelectedAddressId(addr.id);
         setAddress(`${addr.name} - ${addr.phone} - ${addr.detail}`);
     };

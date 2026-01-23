@@ -1,110 +1,257 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 const PRODUCTS = [
+  // MPE Products
   {
-    name: "Bóng Đèn LED Rạng Đông 9W - Ánh sáng trắng 6500K",
-    price: 45000,
-    originalPrice: 53000,
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCX-j61JxZZnsJXe-wvkmddiDlPBcTVlOymb9QgNPRLEao9CCCGcNmKlCN3bAq4nmYkPII9Mf40D50a3r_B5Vx_au_Ug2K1PV27wHNjQZw0QAZc3HwcIdBym734hJf4AVzQlT6zO04AQdGWF4WVWHF2rOJE5wdBXzx9xyhFNDPRcQenmkGt0_I1bw862AWuAKqCQqFHKQa2RXnFxJKOkI_Roqi06QvD8c7oWs5UMz4FplijqX2H46QtY9AYB0Dl_bNR7jBAatqIgj8",
-    rating: 4.5,
-    reviewCount: 45,
-    discount: 15,
+    name: 'Bóng đèn LED Bulb MPE 30W LBD-30W',
+    price: 155000,
+    originalPrice: 185000,
+    image: 'https://placehold.co/400x400?text=Den+MPE+30W',
+    rating: 5,
+    reviewCount: 42,
+    discount: 16,
+    unit: 'Cái',
     categoryId: 3
   },
   {
-    name: "Ống Nhựa Bình Minh Ø27 - Độ bền cao (m)",
-    price: 12000,
-    unit: "/mét",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCDRJuBr48j7mtypMbVQr23Gb9wqYWZESJcwdFpFNmaGk4lEskYgMzRhZn0pUmzIBjlI3C9WnwgQ7Xl8oQ29Q3woIBBPVzxIuGKp0DngvN77lc09YwkHfsU7bhLRoIcU2X2DWMguxKuVlQ6xH49XQxADMItt_iq9j2Bfl4-O3sQCfqp8tVeomzElUv0a4ouVO_MXzwyj8RLui4wBuoon95PFMoi5h3uX0HqQSinr5PKqS8izUn7zWqkchHniaPOdC5gHr06r-_VHs4",
+    name: 'Bóng đèn LED Bulb MPE 40W LBD-40W',
+    price: 215000,
+    originalPrice: 250000,
+    image: 'https://placehold.co/400x400?text=Den+MPE+40W',
+    rating: 4.5,
+    reviewCount: 28,
+    discount: 14,
+    unit: 'Cái',
+    categoryId: 3
+  },
+  {
+    name: 'Đèn LED Downlight MPE Âm Trần 9W RPL-9T',
+    price: 110000,
+    originalPrice: 145000,
+    image: 'https://placehold.co/400x400?text=Den+Downlight+9W',
+    rating: 5,
+    reviewCount: 56,
+    discount: 24,
+    unit: 'Cái',
+    categoryId: 3
+  },
+  {
+    name: 'Đèn LED Panel MPE Vuông 40W FPL-6060T',
+    price: 850000,
+    originalPrice: 1100000,
+    image: 'https://placehold.co/400x400?text=Den+Panel+40W',
+    rating: 5,
+    reviewCount: 12,
+    discount: 23,
+    unit: 'Cái',
+    categoryId: 3
+  },
+  {
+    name: 'Bóng Đèn LED Tuýp Thủy Tinh MPE 22W GT8-120T',
+    price: 85000,
+    originalPrice: 95000,
+    image: 'https://placehold.co/400x400?text=Den+Tuyp+22W',
+    rating: 4.5,
+    reviewCount: 89,
+    discount: 10,
+    unit: 'Cái',
+    categoryId: 3
+  },
+  {
+    name: 'Đèn Pha LED MPE Series FLD2 50W',
+    price: 550000,
+    originalPrice: 680000,
+    image: 'https://placehold.co/400x400?text=Den+Pha+50W',
+    rating: 5,
+    reviewCount: 15,
+    discount: 19,
+    unit: 'Cái',
+    categoryId: 3
+  },
+  {
+    name: 'Đèn Bán Nguyệt MPE 40W BN-40T',
+    price: 240000,
+    originalPrice: 290000,
+    image: 'https://placehold.co/400x400?text=Den+Ban+Nguyet',
+    rating: 4,
+    reviewCount: 22,
+    discount: 17,
+    unit: 'Cái',
+    categoryId: 3
+  },
+  // Nhua Binh Minh
+  {
+    name: 'Ống Nhựa PVC-u Bình Minh D21 (Dày 1.6mm)',
+    price: 10500,
+    originalPrice: 12000,
+    image: 'https://placehold.co/400x400?text=Ong+Nhua+D21',
     rating: 5,
     reviewCount: 120,
+    discount: 12,
+    unit: 'Mét',
     categoryId: 2
   },
   {
-    name: "CB Tép Panasonic 20A - An toàn vượt trội",
-    price: 150000,
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBe2VLDZGZtSAG8SZMOS5ktMttS-4qxHBGinRmpyPTYlw7PC6euYNL9FpqHtyhcNPTjsteph20xrtUqrmCods1obKSph9s3gDmdwpsIY3QqL1Yi0xXxRf5i0RuHRB2rYZKaR0uX0rRyDR167Nlh5fv4Ee-u6dOj2sfNQEuDXEM7zJkrj63z-vlJl1pd3NJWIunLAj9tLLDo5dd8Bo-XHzrtDt19TfQiPtyazbRYzvcpgvrieE9ygyXogPdkmIiQnQsWBY_fQw_SCp4",
-    rating: 4.8,
-    reviewCount: 8,
-    categoryId: 1
+    name: 'Ống Nhựa PVC-u Bình Minh D27 (Dày 1.8mm)',
+    price: 15000,
+    originalPrice: 17000,
+    image: 'https://placehold.co/400x400?text=Ong+Nhua+D27',
+    rating: 5,
+    reviewCount: 95,
+    discount: 11,
+    unit: 'Mét',
+    categoryId: 2
   },
   {
-    name: "Máy Khoan Động Lực Bosch 550W - Chuyên dụng",
-    price: 1200000,
-    originalPrice: 1350000,
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuC-W_lJf-Prbl3tSgzIXZow2cJ14ld-ncGj_RAYs6w2px_Hw9n3xCJeHppCE3txB6W8CljOtMFkZx1td14PMmUDmFB4SCJqgQ4np7XyYkSEh0vrjSxwCvqg9ooUS5nQZA55V2rFHOL6gDhJdCnqV7RH0S53NGztPwvgBDwJfVGY530xwb2Js3nmfaipq-VfTmzSBuRmZXLUlhZM-FmCVM8tjjTDoxGYkP72lFJ15ziIMfGx77Mj3r3rR3XewCdRJDKrvm0AJFYdHSQ",
+    name: 'Ống Nhựa PVC-u Bình Minh D90 (Dày 2.9mm)',
+    price: 110000,
+    originalPrice: 125000,
+    image: 'https://placehold.co/400x400?text=Ong+Nhua+D90',
     rating: 5,
-    reviewCount: 210,
+    reviewCount: 45,
+    discount: 12,
+    unit: 'Mét',
+    categoryId: 2
+  },
+  {
+    name: 'Co 90 Độ Nhựa Bình Minh D27',
+    price: 5000,
+    image: 'https://placehold.co/400x400?text=Co+90+Do',
+    rating: 5,
+    reviewCount: 200,
+    unit: 'Cái',
+    categoryId: 2
+  },
+  {
+    name: 'Tê Đều Nhựa Bình Minh D21',
+    price: 4000,
+    image: 'https://placehold.co/400x400?text=Te+Deu+D21',
+    rating: 5,
+    reviewCount: 180,
+    unit: 'Cái',
+    categoryId: 2
+  },
+  {
+    name: 'Keo Dán Ống Nhựa Bình Minh 200g',
+    price: 35000,
+    image: 'https://placehold.co/400x400?text=Keo+Dan',
+    rating: 4.5,
+    reviewCount: 60,
+    unit: 'Lon',
+    categoryId: 2
+  },
+  // Dat Hoa Products
+  {
+    name: 'Ống HDPE Đạt Hòa D50 PN10',
+    price: 45000,
+    originalPrice: 50000,
+    image: 'https://placehold.co/400x400?text=Ong+HDPE+D50',
+    rating: 4.5,
+    reviewCount: 15,
     discount: 10,
-    categoryId: 4
+    unit: 'Mét',
+    categoryId: 2
+  },
+  {
+    name: 'Ống Cống Chịu Lực HDPE Đạt Hòa D300',
+    price: 450000,
+    originalPrice: 500000,
+    image: 'https://placehold.co/400x400?text=Ong+Cong+HDPE',
+    rating: 5,
+    reviewCount: 8,
+    discount: 10,
+    unit: 'Mét',
+    categoryId: 2
+  },
+  {
+    name: 'Ống uPVC Đạt Hòa D114 (Dày 3.2mm)',
+    price: 125000,
+    originalPrice: 140000,
+    image: 'https://placehold.co/400x400?text=Ong+uPVC+D114',
+    rating: 4,
+    reviewCount: 20,
+    discount: 11,
+    unit: 'Mét',
+    categoryId: 2
+  },
+  {
+    name: 'Phụ Kiện HDPE Đạt Hòa - Nối Thẳng D50',
+    price: 65000,
+    image: 'https://placehold.co/400x400?text=Noi+Thang+D50',
+    rating: 4.5,
+    reviewCount: 12,
+    unit: 'Cái',
+    categoryId: 2
+  },
+  {
+    name: 'Van Cầu Nhựa uPVC Đạt Hòa D27',
+    price: 25000,
+    image: 'https://placehold.co/400x400?text=Van+Cau+D27',
+    rating: 4,
+    reviewCount: 45,
+    unit: 'Cái',
+    categoryId: 2
+  },
+  {
+    name: 'Ống lưới dẻo PVC Đạt Hòa D16',
+    price: 12000,
+    image: 'https://placehold.co/400x400?text=Ong+Luoi+D16',
+    rating: 5,
+    reviewCount: 67,
+    unit: 'Mét',
+    categoryId: 2
+  },
+  {
+    name: 'Máng Gene Luồn Dây Điện Vuông Đạt Hòa 24x14',
+    price: 18000,
+    image: 'https://placehold.co/400x400?text=Mang+Gene+24x14',
+    rating: 4.5,
+    reviewCount: 90,
+    unit: 'Cây',
+    categoryId: 1
   }
 ];
 
 const CATEGORIES = [
-  { id: 1, name: "Dây & Cáp điện", icon: "cable" },
-  { id: 2, name: "Ống nước & Phụ kiện", icon: "water_drop" },
-  { id: 3, name: "Thiết bị chiếu sáng", icon: "lightbulb" },
-  { id: 4, name: "Máy & Dụng cụ", icon: "construction" }
+  { id: 1, name: 'Điện dân dụng', icon: 'lightbulb' },
+  { id: 2, name: 'Ống nước & Phụ kiện', icon: 'water_drop' },
+  { id: 3, name: 'Thiết bị điện MPE', icon: 'bolt' },
+  { id: 4, name: 'Dây cáp điện', icon: 'cable' },
+  { id: 5, name: 'Công tắc & Ổ cắm', icon: 'toggle_on' },
+  { id: 6, name: 'Đèn trang trí', icon: 'tungsten' },
+  { id: 7, name: 'Quạt điện', icon: 'mode_fan' },
+  { id: 8, name: 'Kim khí tổng hợp', icon: 'build' }
 ];
 
 async function main() {
   console.log('Seeding database...');
 
-  // Clean
-  try {
-    await prisma.orderItem.deleteMany();
-    await prisma.order.deleteMany();
-    await prisma.product.deleteMany();
-    await prisma.category.deleteMany();
-    await prisma.user.deleteMany();
-  } catch (e) {
-    console.log('Tables valid/empty, proceeding...');
-  }
-
-  // Create Admin
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  await prisma.user.create({
-    data: {
-      email: 'admin@nhuhong.com',
-      password: hashedPassword,
-      name: 'Admin Như Hồng',
-      role: 'ADMIN'
-    }
-  });
-  console.log('✅ Admin user created: admin@nhuhong.com / admin123');
-
-  // Create Categories
+  // Upsert Categories
   for (const cat of CATEGORIES) {
-    await prisma.category.create({
-      data: cat
+    await prisma.category.upsert({
+      where: { id: cat.id },
+      update: {},
+      create: cat
     });
   }
 
-  // Create Products
-  for (const p of PRODUCTS) {
-    await prisma.product.create({
-      data: p
-    });
-  }
-
-  // Create Initial Coupon
-  await prisma.coupon.create({
-    data: {
-      code: 'GIAMGIA10',
-      discountPercent: 10,
-      expiry: new Date(new Date().setFullYear(new Date().getFullYear() + 1)) // 1 year from now
+  // Create Products if empty
+  const count = await prisma.product.count();
+  if (count === 0) {
+    console.log('No products found, seeding...');
+    for (const p of PRODUCTS) {
+      await prisma.product.create({ data: p });
     }
-  });
-  console.log('✅ Coupon created: GIAMGIA10');
-
-  console.log('Seeding completed.');
+    console.log(`Seeded ${PRODUCTS.length} products.`);
+  } else {
+    console.log('Products already exist, skipping seed.');
+  }
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })

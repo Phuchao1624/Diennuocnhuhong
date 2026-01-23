@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { Address } from '../types';
 
 const UserProfile: React.FC = () => {
     const { user } = useAuth();
@@ -8,7 +9,7 @@ const UserProfile: React.FC = () => {
     const [name, setName] = useState(user?.name || '');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
-    const [addresses, setAddresses] = useState<any[]>([]);
+    const [addresses, setAddresses] = useState<Address[]>([]);
     const [showAddAddress, setShowAddAddress] = useState(false);
     const [newAddress, setNewAddress] = useState({ name: '', phone: '', detail: '', isDefault: false });
 
