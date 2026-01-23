@@ -16,11 +16,17 @@ const FeaturedProducts: React.FC = () => {
     fetch(`/api/products?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
-        setProducts(data);
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          console.error('API returned non-array:', data);
+          setProducts([]);
+        }
         setLoading(false);
       })
       .catch(err => {
         console.error('Failed to fetch products', err);
+        setProducts([]);
         setLoading(false);
       });
   }, [searchParams]);

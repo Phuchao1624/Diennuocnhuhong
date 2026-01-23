@@ -22,7 +22,11 @@ const UserProfile: React.FC = () => {
             const res = await fetch('/api/user/addresses', {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
-            if (res.ok) setAddresses(await res.json());
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data)) setAddresses(data);
+                else setAddresses([]);
+            }
         } catch (error) { console.error(error); }
     };
 

@@ -24,11 +24,16 @@ const Checkout: React.FC = () => {
             })
                 .then(res => res.json())
                 .then((data: Address[]) => {
-                    setAddresses(data);
-                    const defaultAddr = data.find((a) => a.isDefault);
-                    if (defaultAddr) {
-                        setSelectedAddressId(defaultAddr.id);
-                        setAddress(`${defaultAddr.name} - ${defaultAddr.phone} - ${defaultAddr.detail}`);
+                    if (Array.isArray(data)) {
+                        setAddresses(data);
+                        const defaultAddr = data.find((a) => a.isDefault);
+                        if (defaultAddr) {
+                            setSelectedAddressId(defaultAddr.id);
+                            setAddress(`${defaultAddr.name} - ${defaultAddr.phone} - ${defaultAddr.detail}`);
+                        }
+                    } else {
+                        console.error('Invalid address data:', data);
+                        setAddresses([]);
                     }
                 })
                 .catch(console.error);
