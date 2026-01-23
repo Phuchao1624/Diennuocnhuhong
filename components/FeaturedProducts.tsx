@@ -9,7 +9,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Bóng đèn LED Bulb MPE 30W LBD-30W',
     price: 155000,
     originalPrice: 185000,
-    image: 'https://mpe.com.vn/uploads/products/large/lbd-30w-1.jpg',
+    image: 'https://placehold.co/400x400?text=Den+MPE+30W',
     rating: 5,
     reviewCount: 42,
     discount: 16,
@@ -21,7 +21,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Bóng đèn LED Bulb MPE 40W LBD-40W',
     price: 215000,
     originalPrice: 250000,
-    image: 'https://mpe.com.vn/uploads/products/large/lbd-40w-1.jpg',
+    image: 'https://placehold.co/400x400?text=Den+MPE+40W',
     rating: 4.5,
     reviewCount: 28,
     discount: 14,
@@ -33,7 +33,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Đèn LED Downlight MPE Âm Trần 9W RPL-9T',
     price: 110000,
     originalPrice: 145000,
-    image: 'https://mpe.com.vn/uploads/products/large/rpl-9t-1.jpg',
+    image: 'https://placehold.co/400x400?text=Den+Downlight+9W',
     rating: 5,
     reviewCount: 56,
     discount: 24,
@@ -45,7 +45,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Đèn LED Panel MPE Vuông 40W FPL-6060T',
     price: 850000,
     originalPrice: 1100000,
-    image: 'https://mpe.com.vn/uploads/products/large/fpl-6060t-1.jpg',
+    image: 'https://placehold.co/400x400?text=Den+Panel+40W',
     rating: 5,
     reviewCount: 12,
     discount: 23,
@@ -57,7 +57,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Bóng Đèn LED Tuýp Thủy Tinh MPE 22W GT8-120T',
     price: 85000,
     originalPrice: 95000,
-    image: 'https://mpe.com.vn/uploads/products/large/gt8-120t-1.jpg',
+    image: 'https://placehold.co/400x400?text=Den+Tuyp+22W',
     rating: 4.5,
     reviewCount: 89,
     discount: 10,
@@ -69,7 +69,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Đèn Pha LED MPE Series FLD2 50W',
     price: 550000,
     originalPrice: 680000,
-    image: 'https://mpe.com.vn/uploads/products/large/fld2-50t.jpg',
+    image: 'https://placehold.co/400x400?text=Den+Pha+50W',
     rating: 5,
     reviewCount: 15,
     discount: 19,
@@ -81,21 +81,20 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Đèn Bán Nguyệt MPE 40W BN-40T',
     price: 240000,
     originalPrice: 290000,
-    image: 'https://mpe.com.vn/uploads/products/large/bn-40t-1.jpg',
+    image: 'https://placehold.co/400x400?text=Den+Ban+Nguyet',
     rating: 4,
     reviewCount: 22,
     discount: 17,
     unit: 'Cái',
     categoryId: 3
   },
-
   // Nhua Binh Minh
   {
     id: 201,
     name: 'Ống Nhựa PVC-u Bình Minh D21 (Dày 1.6mm)',
     price: 10500,
     originalPrice: 12000,
-    image: 'https://binhminhplastic.com.vn/upload/sanpham/ong-pvc-cung-he-inch-1.jpg',
+    image: 'https://placehold.co/400x400?text=Ong+Nhua+D21',
     rating: 5,
     reviewCount: 120,
     discount: 12,
@@ -107,7 +106,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Ống Nhựa PVC-u Bình Minh D27 (Dày 1.8mm)',
     price: 15000,
     originalPrice: 17000,
-    image: 'https://binhminhplastic.com.vn/upload/sanpham/ong-pvc-cung-he-inch-1.jpg',
+    image: 'https://placehold.co/400x400?text=Ong+Nhua+D27',
     rating: 5,
     reviewCount: 95,
     discount: 11,
@@ -119,7 +118,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     name: 'Ống Nhựa PVC-u Bình Minh D90 (Dày 2.9mm)',
     price: 110000,
     originalPrice: 125000,
-    image: 'https://binhminhplastic.com.vn/upload/sanpham/ong-pvc-cung-he-inch-1.jpg',
+    image: 'https://placehold.co/400x400?text=Ong+Nhua+D90',
     rating: 5,
     reviewCount: 45,
     discount: 12,
@@ -130,7 +129,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     id: 204,
     name: 'Co 90 Độ Nhựa Bình Minh D27',
     price: 5000,
-    image: 'https://binhminhplastic.com.vn/upload/sanpham/co-90-do-1.jpg',
+    image: 'https://placehold.co/400x400?text=Co+90+Do',
     rating: 5,
     reviewCount: 200,
     unit: 'Cái',
@@ -140,7 +139,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     id: 205,
     name: 'Tê Đều Nhựa Bình Minh D21',
     price: 4000,
-    image: 'https://binhminhplastic.com.vn/upload/sanpham/te-deu-1.jpg',
+    image: 'https://placehold.co/400x400?text=Te+Deu+D21',
     rating: 5,
     reviewCount: 180,
     unit: 'Cái',
@@ -150,7 +149,7 @@ const HARDCODED_PRODUCTS: Product[] = [
     id: 206,
     name: 'Keo Dán Ống Nhựa Bình Minh 200g',
     price: 35000,
-    image: 'https://binhminhplastic.com.vn/upload/sanpham/keo-dan-ong-pvc-1.jpg',
+    image: 'https://placehold.co/400x400?text=Keo+Dan',
     rating: 4.5,
     reviewCount: 60,
     unit: 'Lon',
@@ -287,7 +286,7 @@ const FeaturedProducts: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
         {products.map((product) => (
           <Link
-            to={`/product/${product.id}`}
+            to={product.price === 0 ? "/contact" : `/product/${product.id}`}
             key={product.id}
             className="flex flex-col rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-[#1a2632] overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all duration-300 h-full"
           >
@@ -330,13 +329,19 @@ const FeaturedProducts: React.FC = () => {
                 </div>
 
                 <div className="flex items-baseline flex-wrap gap-x-2">
-                  <span className="text-lg font-black text-primary">
-                    {product.price.toLocaleString('vi-VN')}đ
-                  </span>
-                  {product.originalPrice && (
-                    <span className="text-xs text-gray-400 line-through">
-                      {product.originalPrice.toLocaleString('vi-VN')}đ
-                    </span>
+                  {product.price === 0 ? (
+                    <span className="text-lg font-black text-primary hover:underline">Liên hệ</span>
+                  ) : (
+                    <>
+                      <span className="text-lg font-black text-primary">
+                        {product.price.toLocaleString('vi-VN')}đ
+                      </span>
+                      {product.originalPrice && (
+                        <span className="text-xs text-gray-400 line-through">
+                          {product.originalPrice.toLocaleString('vi-VN')}đ
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
@@ -55,8 +55,14 @@ const ProductDetail: React.FC = () => {
                         </div>
 
                         <div className="flex items-baseline gap-3 border-b border-gray-100 dark:border-gray-700 pb-6">
-                            <span className="text-4xl font-black text-primary">{product.price.toLocaleString('vi-VN')}đ</span>
-                            {product.originalPrice && <span className="text-gray-400 line-through text-xl">{product.originalPrice.toLocaleString('vi-VN')}đ</span>}
+                            {product.price === 0 ? (
+                                <Link to="/contact" className="text-4xl font-black text-primary hover:underline">Liên hệ để có giá tốt nhất</Link>
+                            ) : (
+                                <>
+                                    <span className="text-4xl font-black text-primary">{product.price.toLocaleString('vi-VN')}đ</span>
+                                    {product.originalPrice && <span className="text-gray-400 line-through text-xl">{product.originalPrice.toLocaleString('vi-VN')}đ</span>}
+                                </>
+                            )}
                             {product.discount && <span className="bg-red-50 text-red-600 px-2 py-1 rounded font-bold">-{product.discount}%</span>}
                         </div>
 
