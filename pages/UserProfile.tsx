@@ -8,6 +8,58 @@ const UserProfile: React.FC = () => {
     const [name, setName] = useState(user?.name || '');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [addresses, setAddresses] = useState<any[]>([]);
+    const [showAddAddress, setShowAddAddress] = useState(false);
+    const [newAddress, setNewAddress] = useState({ name: '', phone: '', detail: '', isDefault: false });
+
+    React.useEffect(() => {
+        if (user) fetchAddresses();
+    }, [user]);
+
+    const fetchAddresses = async () => {
+        try {
+            const res = await fetch('/api/user/addresses', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            if (res.ok) setAddresses(await res.json());
+        } catch (error) { console.error(error); }
+    };
+
+    const handleAddAddress = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const res = await fetch('/api/user/addresses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(newAddress)
+            });
+            if (res.ok) {
+                showToast('Thêm địa chỉ thành công', 'success');
+                setNewAddress({ name: '', phone: '', detail: '', isDefault: false });
+                setShowAddAddress(false);
+                fetchAddresses();
+            } else {
+                showToast('Thêm thất bại', 'error');
+            }
+        } catch (error) { showToast('Lỗi kết nối', 'error'); }
+    };
+
+    const handleDeleteAddress = async (id: number) => {
+        if (!confirm('Bạn có chắc muốn xóa địa chỉ này?')) return;
+        try {
+            const res = await fetch(`/api/user/addresses/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            if (res.ok) {
+                showToast('Đã xóa địa chỉ', 'success');
+                fetchAddresses();
+            }
+        } catch (error) { showToast('Lỗi kết nối', 'error'); }
+    };
 
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,6 +116,49 @@ const UserProfile: React.FC = () => {
                                 onChange={e => setNewPassword(e.target.value)}
                                 className="block w-full rounded-md border-gray-300 shadow-sm p-2 border"
                             />
+                        </div>
+                    </div>
+
+                    <div className="border-t pt-4 mt-2">
+                        <h3 className="font-bold mb-4 text-sm uppercase text-gray-500 flex justify-between items-center">
+                            Sổ địa chỉ
+                            <button type="button" onClick={() => setShowAddAddress(!showAddAddress)} className="text-primary text-xs hover:underline">+ Thêm mới</button>
+                        </h3>
+
+                        {showAddAddress && (
+                            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-4 border border-gray-200 dark:border-gray-600">
+                                <div className="grid grid-cols-2 gap-3 mb-3">
+                                    <input placeholder="Tên gợi nhớ (Nhà, Cty)" value={newAddress.name} onChange={e => setNewAddress({ ...newAddress, name: e.target.value })} className="p-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
+                                    <input placeholder="Số điện thoại" value={newAddress.phone} onChange={e => setNewAddress({ ...newAddress, phone: e.target.value })} className="p-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
+                                </div>
+                                <input placeholder="Địa chỉ chi tiết" value={newAddress.detail} onChange={e => setNewAddress({ ...newAddress, detail: e.target.value })} className="w-full p-2 border rounded mb-3 dark:bg-gray-700 dark:border-gray-600" />
+                                <div className="flex items-center gap-2 mb-3">
+                                    <input type="checkbox" checked={newAddress.isDefault} onChange={e => setNewAddress({ ...newAddress, isDefault: e.target.checked })} />
+                                    <span className="text-sm dark:text-gray-300">Đặt làm mặc định</span>
+                                </div>
+                                <button type="button" onClick={handleAddAddress} className="bg-primary text-white px-4 py-1.5 rounded text-sm font-bold">Lưu địa chỉ</button>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col gap-3">
+                            {addresses.map(addr => (
+                                <div key={addr.id} className="border border-gray-200 dark:border-gray-700 p-3 rounded-lg relative group">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <span className="font-bold dark:text-white">{addr.name}</span>
+                                                {addr.isDefault && <span className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded uppercase font-bold">Mặc định</span>}
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">{addr.phone}</p>
+                                            <p className="text-sm text-gray-800 dark:text-gray-300">{addr.detail}</p>
+                                        </div>
+                                        <button type="button" onClick={() => handleDeleteAddress(addr.id)} className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {addresses.length === 0 && <p className="text-sm text-gray-400 italic">Chưa có địa chỉ nào.</p>}
                         </div>
                     </div>
 

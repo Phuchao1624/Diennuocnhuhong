@@ -47,6 +47,18 @@ model User {
   orders    Order[]
   reviews   Review[]
   wishlists Wishlist[]
+  addresses Address[]
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  name      String   // Label like "Home", "Office" or Recipient Name
+  phone     String
+  detail    String   // Full address string
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Order {

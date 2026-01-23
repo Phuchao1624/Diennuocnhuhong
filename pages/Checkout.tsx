@@ -11,7 +11,33 @@ const Checkout: React.FC = () => {
     const { showToast } = useToast();
     const navigate = useNavigate();
     const [address, setAddress] = useState('');
+    const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+    const [addresses, setAddresses] = useState<any[]>([]);
+    const [paymentMethod, setPaymentMethod] = useState('COD'); // COD, BANKING
     const [loading, setLoading] = useState(false);
+
+    React.useEffect(() => {
+        if (user) {
+            fetch('/api/user/addresses', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    setAddresses(data);
+                    const defaultAddr = data.find((a: any) => a.isDefault);
+                    if (defaultAddr) {
+                        setSelectedAddressId(defaultAddr.id);
+                        setAddress(`${defaultAddr.name} - ${defaultAddr.phone} - ${defaultAddr.detail}`);
+                    }
+                })
+                .catch(console.error);
+        }
+    }, [user]);
+
+    const handleSelectAddress = (addr: any) => {
+        setSelectedAddressId(addr.id);
+        setAddress(`${addr.name} - ${addr.phone} - ${addr.detail}`);
+    };
 
     if (cart.length === 0) return <div className="p-10 text-center">Giỏ hàng trống</div>;
     if (!user) return (
@@ -35,7 +61,8 @@ const Checkout: React.FC = () => {
                 body: JSON.stringify({
                     items: cart.map(i => ({ productId: i.product.id, quantity: i.quantity, price: i.product.price })),
                     total: finalTotal,
-                    address
+                    address,
+                    paymentMethod // Include payment method in API
                 })
             });
             if (res.ok) {
@@ -59,26 +86,75 @@ const Checkout: React.FC = () => {
 
                 <div className="bg-white dark:bg-[#1a2632] p-6 rounded-xl shadow-md">
                     <h3 className="font-bold text-lg mb-4 dark:text-white">Thông tin giao hàng</h3>
+
+                    {addresses.length > 0 && (
+                        <div className="mb-4 flex gap-3 overflow-x-auto pb-2">
+                            {addresses.map(addr => (
+                                <button
+                                    key={addr.id}
+                                    onClick={() => handleSelectAddress(addr)}
+                                    className={`flex-shrink-0 border p-3 rounded-lg text-left min-w-[200px] hover:border-primary transition-colors ${selectedAddressId === addr.id ? 'border-primary bg-blue-50 dark:bg-blue-900/20' : 'dark:border-gray-600'}`}
+                                >
+                                    <p className="font-bold text-sm dark:text-white">{addr.name}</p>
+                                    <p className="text-xs text-gray-500">{addr.phone}</p>
+                                    <p className="text-xs truncate text-gray-700 dark:text-gray-300">{addr.detail}</p>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1 dark:text-gray-300">Họ tên</label>
+                            <label className="block text-sm font-medium mb-1 dark:text-gray-300">Người nhận</label>
                             <input disabled value={user.name} className="w-full px-4 py-2 bg-gray-100 rounded-lg dark:bg-gray-700 dark:text-gray-300" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1 dark:text-gray-300">Email</label>
-                            <input disabled value={user.email} className="w-full px-4 py-2 bg-gray-100 rounded-lg dark:bg-gray-700 dark:text-gray-300" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1 dark:text-gray-300">Địa chỉ nhận hàng (*)</label>
                             <textarea
                                 value={address}
-                                onChange={e => setAddress(e.target.value)}
+                                onChange={e => {
+                                    setAddress(e.target.value);
+                                    setSelectedAddressId(null);
+                                }}
                                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                                 rows={3}
-                                placeholder="Số nhà, đường, phường/xã..."
+                                placeholder="Chọn từ sổ địa chỉ hoặc nhập mới..."
                             />
                         </div>
                     </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#1a2632] p-6 rounded-xl shadow-md">
+                    <h3 className="font-bold text-lg mb-4 dark:text-white">Phương thức thanh toán</h3>
+                    <div className="flex flex-col gap-3">
+                        <label className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === 'COD' ? 'border-primary bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800 dark:border-gray-600'}`}>
+                            <input type="radio" name="payment" value="COD" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} className="accent-primary size-5" />
+                            <div className="flex flex-col">
+                                <span className="font-bold dark:text-white">Thanh toán khi nhận hàng (COD)</span>
+                                <span className="text-xs text-gray-500">Thanh toán tiền mặt cho shipper khi nhận được hàng.</span>
+                            </div>
+                        </label>
+                        <label className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all ${paymentMethod === 'BANKING' ? 'border-primary bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-800 dark:border-gray-600'}`}>
+                            <input type="radio" name="payment" value="BANKING" checked={paymentMethod === 'BANKING'} onChange={() => setPaymentMethod('BANKING')} className="accent-primary size-5" />
+                            <div className="flex flex-col">
+                                <span className="font-bold dark:text-white">Chuyển khoản Ngân hàng (QR Code)</span>
+                                <span className="text-xs text-gray-500">Quét mã QR để chuyển khoản nhanh chóng.</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    {paymentMethod === 'BANKING' && (
+                        <div className="mt-4 p-4 border border-blue-200 bg-blue-50 rounded-lg flex flex-col items-center text-center dark:bg-blue-900/20 dark:border-blue-800">
+                            <p className="font-bold text-blue-800 dark:text-blue-300 mb-2">Quét mã để thanh toán</p>
+                            <img
+                                src={`https://img.vietqr.io/image/MB-0964413825-print.png?amount=${finalTotal}&addInfo=THANHTOAN DONHANG ${new Date().getTime()}&accountName=NGUYEN DINH HONG`}
+                                alt="VietQR"
+                                className="w-48 h-48 rounded-lg shadow-sm border bg-white"
+                            />
+                            <p className="text-xs text-blue-600 mt-2 dark:text-blue-400">Nội dung CK: TTDH {new Date().getTime()}</p>
+                            <p className="text-xs text-red-500 font-bold mt-1">Lưu ý: Chụp màn hình bill chuyển khoản để đối chiếu khi cần.</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="bg-white dark:bg-[#1a2632] p-6 rounded-xl shadow-md">

@@ -22,3 +22,12 @@ export interface Feature {
   description: string;
   icon: string;
 }
+
+export interface Address {
+  id: number;
+  userId: number;
+  name: string;
+  phone: string;
+  detail: string;
+  isDefault: boolean;
+}

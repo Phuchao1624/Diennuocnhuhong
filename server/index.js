@@ -31,7 +31,26 @@ app.get('/api/products', async (req, res) => {
             where.categoryId = parseInt(String(categoryId));
         }
 
-        const products = await prisma.product.findMany({ where });
+        // Advanced Filtering
+        const { minPrice, maxPrice, rating } = req.query;
+        if (minPrice || maxPrice) {
+            where.price = {};
+            if (minPrice) where.price.gte = parseFloat(String(minPrice));
+            if (maxPrice) where.price.lte = parseFloat(String(maxPrice));
+        }
+        if (rating) {
+            where.rating = { gte: parseFloat(String(rating)) };
+        }
+
+        // Sorting
+        const { sort } = req.query;
+        let orderBy = {};
+        if (sort === 'price_asc') orderBy = { price: 'asc' };
+        else if (sort === 'price_desc') orderBy = { price: 'desc' };
+        else if (sort === 'rating') orderBy = { rating: 'desc' };
+        else orderBy = { createdAt: 'desc' }; // Default new items first
+
+        const products = await prisma.product.findMany({ where, orderBy });
         res.json(products);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch products' });
@@ -311,6 +330,84 @@ app.put('/api/user/profile', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Update failed' });
     }
+});
+
+// User Address Management
+app.get('/api/user/addresses', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const addresses = await prisma.address.findMany({
+            where: { userId: decoded.userId },
+            orderBy: { isDefault: 'desc' }
+        });
+        res.json(addresses);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch addresses' });
+    }
+});
+
+app.post('/api/user/addresses', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const { name, phone, detail, isDefault } = req.body;
+
+        if (isDefault) {
+            // Unset other defaults
+            await prisma.address.updateMany({
+                where: { userId: decoded.userId },
+                data: { isDefault: false }
+            });
+        }
+
+        const address = await prisma.address.create({
+            data: {
+                userId: decoded.userId,
+                name,
+                phone,
+                detail,
+                isDefault: isDefault || false
+            }
+        });
+        res.json(address);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to add address' });
+    }
+});
+
+app.delete('/api/user/addresses/:id', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const { id } = req.params;
+        // Verify ownership
+        const address = await prisma.address.findFirst({
+            where: { id: parseInt(id), userId: decoded.userId }
+        });
+        if (!address) return res.status(404).json({ error: 'Address not found' });
+
+        await prisma.address.delete({ where: { id: parseInt(id) } });
+        res.json({ message: 'Deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to delete address' });
+    }
+});
+
+// Forgot Password (Mock)
+app.post('/api/auth/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    // In a real app, send email here.
+    // For now, we mock success.
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ error: 'Email not found' });
+
+    // Simulate sending email
+    console.log(`Sending password reset to ${email}`);
+    res.json({ message: 'Password reset link sent to your email' });
 });
 
 // Toggle Wishlist
