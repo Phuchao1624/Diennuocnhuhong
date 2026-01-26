@@ -8,7 +8,7 @@ const Register: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { registerWithEmail, loginWithGoogle } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
@@ -16,21 +16,12 @@ const Register: React.FC = () => {
         e.preventDefault();
         setError('');
         try {
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                login(data.token, data.user);
-                showToast('Đăng ký thành công! Chào mừng bạn.', 'success');
-                navigate('/');
-            } else {
-                setError(data.error);
-            }
-        } catch (err) {
-            setError('Failed to register');
+            await registerWithEmail(email, password, name);
+            showToast('Đăng ký thành công! Chào mừng bạn.', 'success');
+            navigate('/');
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || 'Failed to register');
         }
     };
 

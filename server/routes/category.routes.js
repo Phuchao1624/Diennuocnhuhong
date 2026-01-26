@@ -1,12 +1,11 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
+import { getCollection } from '../services/firestore.js';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 router.get('/', async (req, res) => {
     try {
-        const categories = await prisma.category.findMany();
+        const categories = await getCollection('categories');
         res.json(categories);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch categories' });

@@ -1,46 +1,60 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { db } from '../config/firebase.js';
+import { verifyFirebaseToken } from '../middleware/firebaseAuth.js';
+import { getCollection, getDocument, createDocument, updateDocument, deleteDocument } from '../services/firestore.js';
 
 const router = express.Router();
-const prisma = new PrismaClient();
-const JWT_SECRET = 'your-secret-key-change-in-production';
 
 // Get All Products (Filter, Sort, Search)
 router.get('/', async (req, res) => {
     try {
-        const { q, categoryId } = req.query;
-        const where = {};
+        const { categoryId, minPrice, maxPrice, rating, sort } = req.query;
+        let query = db.collection('products');
 
-        if (q) {
-            where.name = { contains: String(q) };
-        }
+        // Firestore simple filters
         if (categoryId && categoryId !== '0') {
-            where.categoryId = parseInt(String(categoryId));
+            query = query.where('categoryId', '==', parseInt(String(categoryId)));
         }
 
-        // Advanced Filtering
-        const { minPrice, maxPrice, rating } = req.query;
-        if (minPrice || maxPrice) {
-            where.price = {};
-            if (minPrice) where.price.gte = parseFloat(String(minPrice));
-            if (maxPrice) where.price.lte = parseFloat(String(maxPrice));
-        }
+        // Note: Firestore requires composite indexes for range queries + sorting.
+        // We will do basic filtering here and potentially more in memory if needed for complex combos,
+        // or ensure indexes are created in Firebase Console.
+
         if (rating) {
-            where.rating = { gte: parseFloat(String(rating)) };
+            query = query.where('rating', '>=', parseFloat(String(rating)));
+        }
+
+        let snapshot = await query.get();
+        let products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // In-memory filtering for ranges/search (limitations of Firestore without advanced setup)
+        const q = req.query.q ? String(req.query.q).toLowerCase() : '';
+        if (q) {
+            products = products.filter(p => p.name.toLowerCase().includes(q));
+        }
+
+        if (minPrice) {
+            products = products.filter(p => p.price >= parseFloat(String(minPrice)));
+        }
+        if (maxPrice) {
+            products = products.filter(p => p.price <= parseFloat(String(maxPrice)));
         }
 
         // Sorting
-        const { sort } = req.query;
-        let orderBy = {};
-        if (sort === 'price_asc') orderBy = { price: 'asc' };
-        else if (sort === 'price_desc') orderBy = { price: 'desc' };
-        else if (sort === 'rating') orderBy = { rating: 'desc' };
-        else orderBy = { createdAt: 'desc' }; // Default
+        if (sort === 'price_asc') {
+            products.sort((a, b) => a.price - b.price);
+        } else if (sort === 'price_desc') {
+            products.sort((a, b) => b.price - a.price);
+        } else if (sort === 'rating') {
+            products.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        } else {
+            // Default sort by createdAt desc if available
+            products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
 
-        const products = await prisma.product.findMany({ where, orderBy });
         res.json(products);
     } catch (error) {
+        console.error("Error fetching products:", error);
         res.status(500).json({ error: 'Failed to fetch products' });
     }
 });
@@ -49,84 +63,105 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await prisma.product.findUnique({
-            where: { id: parseInt(id) },
-            include: {
-                reviews: {
-                    include: { user: true },
-                    orderBy: { createdAt: 'desc' }
-                }
-            }
-        });
-        if (!product) return res.status(404).json({ error: 'Product not found' });
-        res.json(product);
+        const productData = await getDocument('products', id);
+
+        if (!productData) return res.status(404).json({ error: 'Product not found' });
+
+        // Fetch reviews (Sub-collection)
+        const reviewsSnapshot = await db.collection('products').doc(id).collection('reviews').orderBy('createdAt', 'desc').get();
+        const reviews = reviewsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        res.json({ ...productData, reviews });
     } catch (error) {
+        console.error("Error fetching product:", error);
         res.status(500).json({ error: 'Failed to fetch product' });
     }
 });
 
-// Create Product (Admin)
-router.post('/', async (req, res) => {
+// Create Product (Admin) - Protected
+router.post('/', verifyFirebaseToken, async (req, res) => {
     try {
-        const product = await prisma.product.create({ data: req.body });
-        res.json(product);
+        // Simple role check (assuming custom claims or just checking email for now)
+        // For production, set custom claims via Admin SDK or check a 'users' collection
+
+        // Ensure numeric types
+        const data = {
+            ...req.body,
+            price: parseFloat(req.body.price),
+            originalPrice: req.body.originalPrice ? parseFloat(req.body.originalPrice) : null,
+            categoryId: parseInt(req.body.categoryId),
+            rating: 0,
+            reviewCount: 0,
+            createdAt: new Date().toISOString()
+        };
+
+        const newProduct = await createDocument('products', data);
+        res.json(newProduct);
     } catch (error) {
+        console.error("Error creating product:", error);
         res.status(500).json({ error: 'Failed to create product' });
     }
 });
 
-// Update Product (Admin)
-router.put('/:id', async (req, res) => {
+// Update Product (Admin) - Protected
+router.put('/:id', verifyFirebaseToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await prisma.product.update({
-            where: { id: parseInt(id) },
-            data: req.body
-        });
-        res.json(product);
+        const data = { ...req.body };
+        if (data.price) data.price = parseFloat(data.price);
+        if (data.originalPrice) data.originalPrice = parseFloat(data.originalPrice);
+
+        const updated = await updateDocument('products', id, data);
+        res.json(updated);
     } catch (error) {
+        console.error("Error updating product:", error);
         res.status(500).json({ error: 'Failed to update product' });
     }
 });
 
-// Delete Product (Admin)
-router.delete('/:id', async (req, res) => {
+// Delete Product (Admin) - Protected
+router.delete('/:id', verifyFirebaseToken, async (req, res) => {
     try {
         const { id } = req.params;
-        await prisma.product.delete({ where: { id: parseInt(id) } });
+        await deleteDocument('products', id);
         res.json({ message: 'Deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete product' });
     }
 });
 
-// Create Review
-router.post('/reviews', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+// Create Review - Protected
+router.post('/reviews', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
         const { productId, rating, comment } = req.body;
+        const user = req.user; // From verifyFirebaseToken
 
-        const review = await prisma.review.create({
-            data: {
-                userId: decoded.userId,
-                productId: parseInt(productId),
-                rating: parseInt(rating),
-                comment
-            }
-        });
+        const reviewData = {
+            userId: user.uid,
+            userEmail: user.email,
+            // Store basic user info in review to avoid join complexity
+            userName: user.name || user.email?.split('@')[0] || 'User',
+            rating: parseInt(rating),
+            comment,
+            createdAt: new Date().toISOString()
+        };
 
-        const reviews = await prisma.review.findMany({ where: { productId: parseInt(productId) } });
+        // Add to subcollection
+        await db.collection('products').doc(productId).collection('reviews').add(reviewData);
+
+        // Update Aggregate Ratings
+        const reviewsSnapshot = await db.collection('products').doc(productId).collection('reviews').get();
+        const reviews = reviewsSnapshot.docs.map(doc => doc.data());
         const avgRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
 
-        await prisma.product.update({
-            where: { id: parseInt(productId) },
-            data: { rating: avgRating, reviewCount: reviews.length }
+        await updateDocument('products', productId, {
+            rating: avgRating,
+            reviewCount: reviews.length
         });
 
-        res.json(review);
+        res.json({ message: 'Review added', ...reviewData });
     } catch (error) {
+        console.error("Error submitting review:", error);
         res.status(500).json({ error: 'Failed to submit review' });
     }
 });

@@ -1,76 +1,32 @@
 import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
+import { verifyFirebaseToken } from '../middleware/firebaseAuth.js';
 
 const router = express.Router();
-const prisma = new PrismaClient();
-const JWT_SECRET = 'your-secret-key-change-in-production';
 
-// Register
-router.post('/register', async (req, res) => {
-    const { email, password, name } = req.body;
-    if (!email || !password || !name) {
-        return res.status(400).json({ error: 'Missing fields' });
-    }
-    try {
-        const existingUser = await prisma.user.findUnique({ where: { email } });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email already exists' });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await prisma.user.create({
-            data: { email, password: hashedPassword, name }
-        });
-        const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Registration failed' });
-    }
+// Register is handled client-side via Firebase SDK
+router.post('/register', (req, res) => {
+    res.status(400).json({ error: 'Please use client-side registration with Firebase' });
 });
 
-// Login
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user) {
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
-        const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
-        res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
-    } catch (error) {
-        res.status(500).json({ error: 'Login failed' });
-    }
+// Login is handled client-side via Firebase SDK
+router.post('/login', (req, res) => {
+    res.status(400).json({ error: 'Please use client-side login with Firebase' });
 });
 
-// Get Me
-router.get('/me', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-        if (!user) return res.status(401).json({ error: 'User not found' });
-        res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
-    } catch (error) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
+// Get Me - Verifies token and returns user info
+router.get('/me', verifyFirebaseToken, (req, res) => {
+    const user = req.user;
+    res.json({
+        id: user.uid,
+        email: user.email,
+        name: user.name || user.email?.split('@')[0],
+        role: 'user' // Default or fetch from custom claims
+    });
 });
 
-// Forgot Password
-router.post('/forgot-password', async (req, res) => {
-    const { email } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ error: 'Email not found' });
-
-    console.log(`Sending password reset to ${email}`);
-    res.json({ message: 'Password reset link sent to your email' });
+// Forgot Password - Handled client-side via Firebase SDK
+router.post('/forgot-password', (req, res) => {
+    res.status(400).json({ error: 'Please use client-side password reset with Firebase' });
 });
 
 export default router;

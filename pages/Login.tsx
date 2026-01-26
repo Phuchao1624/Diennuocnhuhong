@@ -7,7 +7,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { loginWithEmail, loginWithGoogle } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
 
@@ -15,21 +15,23 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                login(data.token, data.user);
-                showToast('Đăng nhập thành công!', 'success');
-                navigate('/');
-            } else {
-                setError(data.error);
-            }
-        } catch (err) {
-            setError('Failed to login');
+            await loginWithEmail(email, password);
+            showToast('Đăng nhập thành công!', 'success');
+            navigate('/');
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || 'Failed to login');
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            await loginWithGoogle();
+            showToast('Đăng nhập Google thành công!', 'success');
+            navigate('/');
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || 'Failed to login with Google');
         }
     };
 
@@ -61,6 +63,10 @@ const Login: React.FC = () => {
                     </div>
                     <button type="submit" className="w-full bg-primary text-white font-bold py-3 rounded-lg hover:bg-blue-600 transition-colors mt-2">
                         Đăng Nhập
+                    </button>
+                    <button type="button" onClick={handleGoogleLogin} className="w-full bg-white text-gray-700 border border-gray-300 font-bold py-3 rounded-lg hover:bg-gray-50 transition-colors mt-2 flex justify-center items-center gap-2">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                        Đăng nhập bằng Google
                     </button>
                 </form>
                 <p className="mt-4 text-center text-sm dark:text-gray-400">

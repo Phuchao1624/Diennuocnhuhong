@@ -1,46 +1,47 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import { db } from '../config/firebase.js';
+import { verifyFirebaseToken } from '../middleware/firebaseAuth.js';
+import { auth } from '../config/firebase.js'; // Admin SDK
 
 const router = express.Router();
-const prisma = new PrismaClient();
-const JWT_SECRET = 'your-secret-key-change-in-production';
 
 // User Profile Update
-router.put('/profile', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+router.put('/profile', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const { name, currentPassword, newPassword } = req.body;
+        // In Firebase, basic profile (name, email) updates are often client-side,
+        // but if we store custom data in a 'users' collection, we update it here.
+        // Also we can update Auth user via Admin SDK.
 
-        const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+        const user = req.user;
+        const { name, newPassword } = req.body;
 
-        if (newPassword) {
-            const valid = await bcrypt.compare(currentPassword, user.password);
-            if (!valid) return res.status(400).json({ error: 'Mật khẩu hiện tại không đúng' });
-            const hashed = await bcrypt.hash(newPassword, 10);
-            await prisma.user.update({ where: { id: user.id }, data: { password: hashed, name } });
-        } else {
-            await prisma.user.update({ where: { id: user.id }, data: { name } });
+        if (name) {
+            await auth.updateUser(user.uid, {
+                displayName: name
+            });
         }
+        if (newPassword) {
+            await auth.updateUser(user.uid, {
+                password: newPassword
+            });
+        }
+
+        // If we were syncing to a 'users' collection:
+        // await db.collection('users').doc(user.uid).set({ name }, { merge: true });
+
         res.json({ message: 'Updated successfully' });
     } catch (error) {
+        console.error("Update profile error:", error);
         res.status(500).json({ error: 'Update failed' });
     }
 });
 
-// Get User Addresses
-router.get('/addresses', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+// Get User Addresses (Subcollection)
+router.get('/addresses', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const addresses = await prisma.address.findMany({
-            where: { userId: decoded.userId },
-            orderBy: { isDefault: 'desc' }
-        });
+        const user = req.user;
+        const snapshot = await db.collection('users').doc(user.uid).collection('addresses').orderBy('isDefault', 'desc').get();
+        const addresses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.json(addresses);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch addresses' });
@@ -48,48 +49,40 @@ router.get('/addresses', async (req, res) => {
 });
 
 // Add Address
-router.post('/addresses', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+router.post('/addresses', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = req.user;
         const { name, phone, detail, isDefault } = req.body;
+        const addressesRef = db.collection('users').doc(user.uid).collection('addresses');
 
         if (isDefault) {
-            await prisma.address.updateMany({
-                where: { userId: decoded.userId },
-                data: { isDefault: false }
+            // Find current default and unset it
+            const defaultSnapshot = await addressesRef.where('isDefault', '==', true).get();
+            const batch = db.batch();
+            defaultSnapshot.docs.forEach(doc => {
+                batch.update(doc.ref, { isDefault: false });
             });
+            await batch.commit();
         }
 
-        const address = await prisma.address.create({
-            data: {
-                userId: decoded.userId,
-                name,
-                phone,
-                detail,
-                isDefault: isDefault || false
-            }
+        const newAddress = await addressesRef.add({
+            name, phone, detail, isDefault: !!isDefault,
+            createdAt: new Date().toISOString()
         });
-        res.json(address);
+
+        res.json({ id: newAddress.id, name, phone, detail, isDefault });
     } catch (error) {
+        console.error("Add address error:", error);
         res.status(500).json({ error: 'Failed to add address' });
     }
 });
 
 // Delete Address
-router.delete('/addresses/:id', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+router.delete('/addresses/:id', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = req.user;
         const { id } = req.params;
-        const address = await prisma.address.findFirst({
-            where: { id: parseInt(id), userId: decoded.userId }
-        });
-        if (!address) return res.status(404).json({ error: 'Address not found' });
-
-        await prisma.address.delete({ where: { id: parseInt(id) } });
+        await db.collection('users').doc(user.uid).collection('addresses').doc(id).delete();
         res.json({ message: 'Deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete address' });
@@ -97,41 +90,42 @@ router.delete('/addresses/:id', async (req, res) => {
 });
 
 // Wishlist: Toggle
-router.post('/wishlist', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+router.post('/wishlist', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = req.user;
         const { productId } = req.body;
+        const wishlistRef = db.collection('users').doc(user.uid).collection('wishlist');
 
-        const existing = await prisma.wishlist.findUnique({
-            where: { userId_productId: { userId: decoded.userId, productId: parseInt(productId) } }
-        });
+        // Check if exists
+        const snapshot = await wishlistRef.where('productId', '==', productId).limit(1).get();
 
-        if (existing) {
-            await prisma.wishlist.delete({ where: { id: existing.id } });
+        if (!snapshot.empty) {
+            await snapshot.docs[0].ref.delete();
             res.json({ added: false });
         } else {
-            await prisma.wishlist.create({
-                data: { userId: decoded.userId, productId: parseInt(productId) }
+            // Fetch product details to store denormalized if needed, or just ID
+            const productDoc = await db.collection('products').doc(productId).get();
+            const productData = productDoc.data() || {};
+
+            await wishlistRef.add({
+                productId,
+                product: productData, // Store snapshot of product for easier display
+                createdAt: new Date().toISOString()
             });
             res.json({ added: true });
         }
     } catch (error) {
+        console.error("Wishlist error:", error);
         res.status(500).json({ error: 'Failed' });
     }
 });
 
 // Wishlist: Get All
-router.get('/wishlist', async (req, res) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+router.get('/wishlist', verifyFirebaseToken, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const wishlist = await prisma.wishlist.findMany({
-            where: { userId: decoded.userId },
-            include: { product: true }
-        });
+        const user = req.user;
+        const snapshot = await db.collection('users').doc(user.uid).collection('wishlist').get();
+        const wishlist = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         res.json(wishlist);
     } catch (error) {
         res.status(500).json({ error: 'Failed' });
@@ -141,18 +135,21 @@ router.get('/wishlist', async (req, res) => {
 // Newsletter
 router.post('/newsletter', async (req, res) => {
     const { email } = req.body;
-    if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
-    }
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+
     try {
-        const subscriber = await prisma.newsletter.create({
-            data: { email }
-        });
-        res.json(subscriber);
-    } catch (error) {
-        if (error.code === 'P2002') {
+        // Check uniqueness manually
+        const snapshot = await db.collection('newsletter').where('email', '==', email).limit(1).get();
+        if (!snapshot.empty) {
             return res.status(409).json({ error: 'Email already exists' });
         }
+
+        await db.collection('newsletter').add({
+            email,
+            createdAt: new Date().toISOString()
+        });
+        res.json({ email });
+    } catch (error) {
         res.status(500).json({ error: 'Failed to subscribe' });
     }
 });
